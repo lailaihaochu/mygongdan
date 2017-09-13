@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoWorkDetailDao">
+    
+	<sql id="woWorkDetailColumns">
+		a.id AS "id",
+		a.wo_worksheet AS "woWorksheet.id",
+		wo.sn_no AS "woWorksheet.snNo",
+		wo.wo_no AS "woWorksheet.woNo",
+		a.name AS "name",
+		a.content AS "content",
+		a.status AS "status",
+		a.tag AS "tag",
+		a.sort AS "sort",
+		a.remarks AS "remarks",
+		a.result AS "result",
+		a.attach_files AS "attachFiles",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="woWorkDetailJoins">
+		LEFT JOIN wo_worksheet wo ON wo.id=a.wo_worksheet
+	</sql>
+    
+	<select id="get" resultType="WoWorkDetail">
+		SELECT 
+			<include refid="woWorkDetailColumns"/>
+		FROM wo_work_detail a
+		<include refid="woWorkDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WoWorkDetail">
+		SELECT 
+			<include refid="woWorkDetailColumns"/>
+		FROM wo_work_detail a
+		<include refid="woWorkDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="woWorksheet!=null and woWorksheet.id !=''">
+				AND a.wo_worksheet=#{woWorksheet.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WoWorkDetail">
+		SELECT 
+			<include refid="woWorkDetailColumns"/>
+		FROM wo_work_detail a
+		<include refid="woWorkDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_work_detail(
+			id,
+			wo_worksheet,
+			name,
+			sort,
+			content,
+			status,
+			tag,
+			remarks,
+			result,
+			attach_files,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{woWorksheet.id},
+			#{name},
+			#{sort},
+			#{content},
+			#{status},
+			#{tag},
+			#{remarks},
+			#{result},
+			#{attachFiles},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wo_work_detail SET 	
+			wo_worksheet = #{woWorksheet.id},
+			name = #{name},
+			tag=#{tag},
+			sort=#{sort},
+			content = #{content},
+			status = #{status},
+			remarks = #{remarks},
+			result=#{result},
+			attach_files = #{attachFiles}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wo_work_detail SET
+		del_flag=#{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE wo_worksheet = #{woWorksheet.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

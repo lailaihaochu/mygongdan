@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoMsgRecordDao">
+    <sql id="woMsgRecordColumns">
+        a.id AS "id",
+        a.notify_id AS "oaNotify.id",
+        ms.title AS "oaNotify.title",
+        ms.create_by AS "oaNotify.createBy",
+        ms.create_date AS "oaNotify.createDate",
+        ms.update_date AS "oaNotify.updateDate",
+        u.name AS "oaNotify.createBy.name",
+        a.work_sheet AS "worksheet.id"
+
+    </sql>
+    <sql id="woMsgRecordJoins">
+        JOIN oa_notify ms ON ms.id=a.notify_id
+        JOIN sys_user u ON u.id = ms.create_by
+    </sql>
+    <select id="findByWorksheet" resultType="WoMsgRecord">
+        SELECT
+        <include refid="woMsgRecordColumns" />
+        FROM wo_worksheet_msg a
+        <include refid="woMsgRecordJoins" />
+        WHERE a.work_sheet=#{param1}
+    </select>
+    <insert id="insert" >
+        INSERT  INTO wo_worksheet_msg(
+        id,
+        notify_id,
+        work_sheet
+        )VALUES (
+        #{id},
+        #{oaNotify.id},
+        #{worksheet.id}
+        )
+    </insert>
+</mapper>

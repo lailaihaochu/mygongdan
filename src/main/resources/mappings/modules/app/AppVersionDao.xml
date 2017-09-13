@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.app.dao.AppVersionDao">
+    <sql id="appVersionColumns">
+        a.id,
+		a.ver_code AS "verCode",
+		a.ver_name AS "verName",
+		a.app_name AS "appName",
+		a.file_path AS "filePath",
+		a.doc_path AS "docPath",
+		a.remarks,
+		a.create_by AS "createBy.id",
+		c.name AS "createBy.name",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		u.name AS "updateBy.name",
+		a.update_date,
+		a.del_flag
+    </sql>
+    <sql id="appVersionJoins">
+        LEFT JOIN sys_user c on c.id = a.create_by
+        LEFT JOIN sys_user u on u.id = a.update_by
+    </sql>
+    <select id="get" resultType="AppVersion">
+        SELECT
+        <include refid="appVersionColumns"/>
+        FROM app_version a
+        <include refid="appVersionJoins"/>
+        WHERE a.id = #{id}
+    </select>
+    <select id="getLastVersion" resultType="AppVersion">
+        SELECT
+        <include refid="appVersionColumns"/>
+        FROM app_version a
+        <include refid="appVersionJoins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        AND a.app_name=#{appName}
+        ORDER BY a.ver_code DESC
+        limit 0,1
+    </select>
+    <select id="findList" resultType="AppVersion">
+        select
+        <include refid="appVersionColumns"/>
+        FROM app_version a
+        <include refid="appVersionJoins"/>
+        WHERE a.del_flag=#{DEL_FLAG_NORMAL}
+        <if test="appName !=null and appName !=''">
+            AND a.app_name like CONCAT('%',#{appName},'%')
+        </if>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.ver_code DESC, a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <insert id="insert">
+        INSERT  INTO app_version (id,app_name,ver_code,ver_name,file_path,doc_path,
+        remarks,create_by,create_date,update_by,update_date,del_flag)
+        VALUES (#{id},#{appName},#{verCode},#{verName},#{filePath},#{docPath},
+        #{remarks},#{createBy.id},#{createDate},#{updateBy.id},#{updateDate},#{delFlag});
+    </insert>
+    <update id="update">
+        UPDATE app_version SET
+        app_name=#{appName},
+        ver_code=#{verCode},
+        ver_name=#{verName},
+        file_path=#{filePath},
+        doc_path=#{docPath},
+        remarks=#{remarks},
+        update_by=#{updateBy.id},
+        update_date=#{updateDate}
+        WHERE
+        id=#{id}
+    </update>
+    <delete id="delete">
+        UPDATE app_version set del_flag = #{DEL_FLAG_DELETE}
+        WHERE id=#{id}
+    </delete>
+</mapper>

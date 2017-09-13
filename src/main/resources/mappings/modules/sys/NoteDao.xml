@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.sys.dao.NoteDao">
+    <sql id="noteColumns">
+        a.id ,
+        a.owner AS "owner.id",
+        a.title,
+        a.content,
+        a.remind_date AS "remindDate"
+    </sql>
+
+    <select id="get" resultType="Note">
+        SELECT
+        <include refid="noteColumns"/>
+        FROM oa_note a
+        where id=#{id}
+    </select>
+
+    <select id="findByUser" resultType="Note">
+        SELECT
+        <include refid="noteColumns"/>
+        FROM  oa_note a
+        where a.owner=#{owner.id}
+    </select>
+    <insert id="insert">
+        insert into oa_note(
+        id,
+        owner,
+        title,
+        content,
+        remind_date
+        )VALUES (
+        #{id},
+        #{owner.id},
+        #{title},
+        #{content},
+        #{remindDate}
+        )
+    </insert>
+    <update id="update">
+        update oa_note SET
+        title=#{title},
+        content=#{content},
+        remind_date=#{remindDate}
+        where id=#{id}
+    </update>
+    <delete id="delete">
+        DELETE from oa_note
+        where id=#{id}
+    </delete>
+</mapper>

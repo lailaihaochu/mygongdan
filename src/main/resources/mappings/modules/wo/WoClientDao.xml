@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoClientDao">
+    
+	<sql id="woClientColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.full_name AS "fullName",
+		a.code AS "code",
+		a.office_id AS "office.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o4.name AS "office.name",
+		o4.code AS "office.code",
+		oa.id AS "office.area.id",
+    	oa.name AS "office.area.name",
+    	oa.parent_id AS "office.area.parent.id",
+    	oa.parent_ids AS "office.area.parentIds"
+
+	</sql>
+	
+	<sql id="woClientJoins">
+		LEFT JOIN sys_office o4 ON o4.id = a.office_id
+		LEFT JOIN sys_area oa ON oa.id = o4.area_id
+	</sql>
+    
+	<select id="get" resultType="WoClient">
+		SELECT 
+			<include refid="woClientColumns"/>
+		FROM wo_client a
+		<include refid="woClientJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WoClient">
+		SELECT 
+			<include refid="woClientColumns"/>
+		FROM wo_client a
+		<include refid="woClientJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+			<if test="code !=null and code !=''">
+				AND a.code LIKE concat('%',#{code},'%')
+			</if>
+			<if test="office !=null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WoClient">
+		SELECT 
+			<include refid="woClientColumns"/>
+		FROM wo_client a
+		<include refid="woClientJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findClientByAreaId" resultType="WoClient">
+		SELECT
+		<include refid="woClientColumns"/>
+		FROM wo_client a
+		<include refid="woClientJoins"/>
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND o4.area_id=#{office.area.id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_client(
+			id,
+			name,
+			full_name,
+			code,
+			office_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{fullName},
+			#{code},
+			#{office.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wo_client SET 	
+			name = #{name},
+			full_name=#{fullName},
+			code = #{code},
+			office_id = #{office.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wo_client SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

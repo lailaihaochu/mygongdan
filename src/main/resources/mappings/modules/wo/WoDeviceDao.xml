@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoDeviceDao">
+
+    <sql id="woDeviceJoins">
+        LEFT JOIN wo_client c ON c.id = a.client_id
+        LEFT JOIN wo_station s ON s.id = a.station_id
+        LEFT JOIN wo_area d1 ON d1.id = a.area_id
+        LEFT JOIN wo_area d2 ON d2.id = a.city_id
+        LEFT JOIN wo_dev_position d3 ON d3.id = a.build_id
+        LEFT JOIN wo_dev_position d4 ON d4.id = a.floor_id
+        LEFT JOIN wo_dev_position d5 ON d5.id = a.room_id
+        LEFT JOIN wo_dev_category t1 ON  t1.id =a.first_type_id
+        LEFT JOIN wo_dev_category t2 ON  t2.id =a.sec_type_id
+        LEFT JOIN wo_dev_category t3 ON  t3.id =a.third_type_id
+--         LEFT JOIN wo_dev_category b ON  b.id =a.brand_id
+--         LEFT JOIN wo_dev_category m ON  m.id =a.model_id
+    </sql>
+
+    <sql id="woDeviceColumns">
+        a.id AS "id",
+        a.name AS "name",
+        a.devcode AS "devCode",
+        a.assetcode AS "assetCode",
+        a.sncode AS "snCode",
+        a.online_date AS "onLineDate",
+
+        a.keyparams as "keyParams",
+        a.memo as "memo",
+        a.dev_status as "devStatus",
+        a.supplier as "supplier",
+        a.supplier_man as "supplierMan",
+        a.supplier_phone as "supplierPhone",
+        a.manufacture_date as "manufactureDate",
+        a.repair_start_date as "repairStartDate",
+        a.repair_end_date as "repairEndDate",
+        a.service_level as "serviceLevel",
+        a.service_start_date as "serviceStartDate",
+        a.service_end_date as "serviceEndDate",
+
+        a.client_id AS "woClient.id",
+        a.station_id AS "woStation.id",
+        a.area_id AS "woArea.id",
+        a.city_id AS "woCity.id",
+        a.build_id AS "woBuild.id",
+        a.floor_id AS "woFloor.id",
+        a.room_id AS "woRoom.id",
+        a.first_type_id AS "deviceType1.id",
+        a.sec_type_id AS "deviceType2.id",
+        a.third_type_id AS "deviceType3.id",
+        a.brand_id AS "deviceBrand",
+        a.model_id AS "deviceModel",
+        c.name AS "woClient.name",
+        s.name AS "woStation.name",
+        d1.name as "woArea.name",
+        d2.name as "woCity.name",
+        d3.name as "woBuild.name",
+        d4.name as "woFloor.name",
+        d5.name as "woRoom.name",
+        t1.name AS "deviceType1.name",
+        t2.name AS "deviceType2.name",
+        t3.name AS "deviceType3.name",
+--         b.name AS "deviceBrand.name",
+--         m.name AS "deviceModel.name",
+
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <select id="get" resultType="WoDevice">
+        SELECT
+        <include refid="woDeviceColumns"/>
+        FROM wo_device a
+        <include refid="woDeviceJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="WoDevice">
+        SELECT
+        <include refid="woDeviceColumns"/>
+        FROM wo_device a
+        <include refid="woDeviceJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="devCode != null and devCode != ''">
+                AND a.devcode LIKE  concat('%',#{devCode},'%')
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name LIKE  concat('%',#{name},'%')
+            </if>
+            <if test="assetCode != null and assetCode != ''">
+                AND a.assetcode LIKE  concat('%',#{assetCode},'%')
+            </if>
+            <if test="snCode != null and snCode != ''">
+                AND a.sncode LIKE  concat('%',#{snCode},'%')
+            </if>
+            <if test="supplier != null and supplier != ''">
+                AND a.supplier LIKE  concat('%',#{supplier},'%')
+            </if>
+            <if test="supplierMan != null and supplierMan != ''">
+                AND a.supplier_man LIKE  concat('%',#{supplierMan},'%')
+            </if>
+            <if test="supplierPhone != null and supplierPhone != ''">
+                AND a.supplier_phone LIKE  concat('%',#{supplierPhone},'%')
+            </if>
+            <if test="deviceBrand != null and deviceBrand != ''">
+                AND a.brand_id LIKE  concat('%',#{deviceBrand},'%')
+            </if>
+            <if test="deviceModel != null and deviceModel != ''">
+                AND a.model_id LIKE  concat('%',#{deviceModel},'%')
+            </if>
+            <if test="keyParams != null and keyParams != ''">
+                AND a.keyparams LIKE  concat('%',#{keyParams},'%')
+            </if>
+            <if test="beginServiceStartDate !=null">
+                AND a.service_start_date <![CDATA[ >= #{beginServiceStartDate} ]]>
+            </if>
+            <if test="endServiceStartDate !=null">
+                AND a.service_start_date <![CDATA[ <= #{endServiceStartDate} ]]>
+            </if>
+            <if test="beginServiceEndDate !=null">
+                AND a.service_end_date <![CDATA[ >= #{beginServiceEndDate} ]]>
+            </if>
+            <if test="endServiceEndDate !=null">
+                AND a.service_end_date <![CDATA[ <= #{endServiceEndDate} ]]>
+            </if>
+            <if test="beginRepairEndDate !=null">
+                AND a.repair_end_date <![CDATA[ >= #{beginRepairEndDate} ]]>
+            </if>
+            <if test="endRepairEndDate !=null">
+                AND a.repair_end_date <![CDATA[ <= #{endRepairEndDate} ]]>
+            </if>
+            <if test="devStatus !=null and devStatus !=0">
+                AND a.dev_status=#{devStatus}
+            </if>
+            <if test="serviceLevel !=null and serviceLevel !=0">
+                AND a.service_level=#{serviceLevel}
+            </if>
+            <if test="woClient !=null and woClient.id !=null and woClient.id !=''">
+                AND a.client_id=#{woClient.id}
+            </if>
+            <if test="woStation !=null and woStation.id!=null and woStation.id !=''">
+                AND a.station_id =#{woStation.id}
+            </if>
+            <if test="deviceType1 !=null and deviceType1.id!=null and deviceType1.id !=''">
+                AND a.first_type_id =#{deviceType1.id}
+            </if>
+            <if test="deviceType2 !=null and deviceType2.id!=null and deviceType2.id !=''">
+                AND a.sec_type_id =#{deviceType2.id}
+            </if>
+            <if test="deviceType3 !=null and deviceType3.id!=null and deviceType3.id !=''">
+                AND a.third_type_id =#{deviceType3.id}
+            </if>
+            <!--<if test="deviceBrand !=null and deviceBrand.id!=null and deviceBrand.id !=''">-->
+                <!--AND a.brand_id =#{deviceBrand.id}-->
+            <!--</if>-->
+            <!--<if test="deviceModel !=null and deviceModel.id!=null and deviceModel.id !=''">-->
+                <!--AND a.model_id =#{deviceModel.id}-->
+            <!--</if>-->
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="WoDevice">
+        SELECT
+        <include refid="woDeviceColumns"/>
+        FROM wo_device a
+        <include refid="woDeviceJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO wo_device(
+        id,
+        name,
+        assetcode,
+        sncode,
+        devcode,
+        online_date,
+        client_id,
+        station_id,
+        area_id,
+        city_id,
+        build_id,
+        floor_id,
+        room_id,
+        first_type_id,
+        sec_type_id,
+        third_type_id,
+        brand_id,
+        model_id,
+
+        keyparams,
+        memo,
+        dev_status,
+        supplier,
+        supplier_man,
+        supplier_phone,
+        manufacture_date,
+        repair_start_date,
+        repair_end_date,
+        service_level,
+        service_start_date,
+        service_end_date,
+
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        ) VALUES (
+        #{id},
+        #{name},
+        #{assetCode},
+        #{snCode},
+        #{devCode},
+        #{onLineDate},
+        #{woClient.id},
+        #{woStation.id},
+        #{woArea.id},
+        #{woCity.id},
+        #{woBuild.id},
+        #{woFloor.id},
+        #{woRoom.id},
+        #{deviceType1.id},
+        #{deviceType2.id},
+        #{deviceType3.id},
+        #{deviceBrand},
+        #{deviceModel},
+
+        #{keyParams},
+        #{memo},
+        #{devStatus},
+        #{supplier},
+        #{supplierMan},
+        #{supplierPhone},
+        #{manufactureDate},
+        #{repairStartDate},
+        #{repairEndDate},
+        #{serviceLevel},
+        #{serviceStartDate},
+        #{serviceEndDate},
+
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE wo_device SET
+        name = #{name},
+        assetcode = #{assetCode},
+        sncode = #{snCode},
+        devcode = #{devCode},
+        online_date = #{onLineDate},
+        client_id = #{woClient.id},
+        station_id = #{woStation.id},
+        area_id = #{woArea.id},
+        city_id = #{woCity.id},
+        first_type_id = #{deviceType1.id},
+        sec_type_id = #{deviceType2.id},
+        third_type_id = #{deviceType3.id},
+        brand_id = #{deviceBrand},
+        model_id = #{deviceModel},
+
+        keyparams = #{keyParams},
+        memo = #{memo},
+        dev_status = #{devStatus},
+        supplier = #{supplier},
+        supplier_man = #{supplierMan},
+        supplier_phone = #{supplierPhone},
+        manufacture_date = #{manufactureDate},
+        repair_start_date = #{repairStartDate},
+        repair_end_date = #{repairEndDate},
+        service_level = #{serviceLevel},
+        service_start_date = #{serviceStartDate},
+        service_end_date = #{serviceEndDate},
+
+        update_by = #{updateBy.id},
+        update_date = #{updateDate},
+        remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE wo_device SET
+        del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findDeviceByAssetCode" resultType="WoDevice">
+        SELECT
+        id
+        FROM wo_device
+        WHERE assetcode = #{param1} and del_flag = '0'
+    </select>
+
+    <select id="findLastWoDevice" resultType="WoDevice">
+        SELECT
+        <include refid="woDeviceColumns"/>
+        FROM wo_device a
+        <include refid="woDeviceJoins"/>
+        <where>
+            a.create_date = (select min(create_date) from wo_device)
+            and a.del_flag = '1'
+        </where>
+    </select>
+
+</mapper>

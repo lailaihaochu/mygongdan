@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.PoRecordDao">
+    
+	<sql id="poRecordColumns">
+		a.id ,
+		a.sn_no AS "snNo",
+		a.po_no AS "poNo",
+		a.client_id AS "client.id",
+		c.name AS "client.name",
+		c.full_name AS "client.fullName",
+		a.pm_id AS "pm.id",
+		pm.name AS "pm.name",
+		a.seller AS "seller",
+		a.status AS "status",
+		a.part_a AS "partA.id",
+		o1.name AS "partA.name",
+		a.contact AS "contact",
+		a.cont_phone AS "contPhone",
+		a.part_b AS "partB.id",
+		o2.name AS "partB.name",
+		a.proj_name AS "projectName",
+		a.cost AS "cost",
+		a.p_cost AS "pCost",
+		a.p_nCost AS "pNCost",
+		a.bill_type AS "billType",
+		a.kai_piao AS "kaiPiao",
+		a.kp_type AS "kpType",
+		a.cnt_cost AS "cntCost",
+		a.sell_cost AS "sellCost",
+		a.sell_tax AS "sellTax",
+		a.inc_tax AS "incTax",
+		a.other_tax AS "otherTax",
+		a.maoli AS "maoli",
+		a.maolip AS "maolip",
+		a.tot_cost AS "totCost",
+		a.cmp_tax AS "cmpTax",
+		a.pure_earn AS "pureEarn",
+		a.pure_earnp AS "pureEarnp",
+		a.shi_gong_fee AS "shiGongFee",
+		a.zhao_dai_fee AS "zhaoDaiFee",
+		a.create_by AS "createBy.id",
+		u.name AS "createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="poRecordJoins">
+		LEFT JOIN wo_client c ON  c.id =a.client_id
+		LEFT JOIN sys_office o1 ON o1.id=a.part_a
+		LEFT JOIN sys_office o2 ON o2.id =a.part_b
+		LEFT JOIN sys_user u ON  u.id =a.create_by
+	  	LEFT JOIN sys_user pm ON pm.id= a.pm_id
+	</sql>
+    
+	<select id="get" resultType="PoRecord">
+		SELECT 
+			<include refid="poRecordColumns"/>
+		FROM po_record a
+		<include refid="poRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PoRecord">
+		SELECT 
+			<include refid="poRecordColumns"/>
+		FROM po_record a
+		<include refid="poRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginDate !=null">
+				AND a.create_date &gt;=  #{beginDate}
+			</if>
+			<if test="endDate !=null">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="client !=null and client.id !=null and client.id !=''">
+				AND a.client_id=#{client.id}
+			</if>
+			<if test="pm !=null and pm.id !=null and pm.id !=''">
+				AND a.pm_id=#{pm.id}
+			</if>
+			<if test="pm !=null and pm.id !=null and pm.id !=''">
+				AND a.pm_id=#{pm.id}
+			</if>
+			<if test="snNo !=null and snNo !=''">
+				AND  a.sn_no LIKE concat('%',#{snNo},'%')
+			</if>
+			<if test="poNo !=null and poNo !=''">
+				AND  a.po_no LIKE concat('%',#{poNo},'%')
+			</if>
+			<if test="status!=null and status !=''">
+				AND  a.status=#{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PoRecord">
+		SELECT 
+			<include refid="poRecordColumns"/>
+		FROM po_record a
+		<include refid="poRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO po_record(
+			id,
+			sn_no,
+			po_no,
+			client_id,
+			pm_id,
+			seller,
+			status,
+			part_a,
+			contact,
+			cont_phone,
+			part_b,
+			proj_name,
+			cost,
+			p_cost,
+			p_nCost,
+			bill_type,
+			kai_piao,
+			kp_type,
+			cnt_cost,
+			sell_cost,
+			sell_tax,
+			inc_tax ,
+			other_tax ,
+			maoli ,
+			maolip ,
+			tot_cost,
+			cmp_tax ,
+			pure_earn ,
+			pure_earnp,
+			shi_gong_fee,
+			zhao_dai_fee,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{snNo},
+			#{poNo},
+			#{client.id},
+			#{pm.id},
+			#{seller},
+			#{status},
+			#{partA.id},
+			#{contact},
+			#{contPhone},
+			#{partB.id},
+			#{projectName},
+			#{cost},
+			#{pCost},
+			#{pNCost},
+			#{billType},
+			#{kaiPiao},
+			#{kpType},
+			#{cntCost},
+			#{sellCost},
+			#{sellTax},
+			#{incTax},
+			#{otherTax},
+			#{maoli},
+			#{maolip},
+			#{totCost},
+			#{cmpTax},
+			#{pureEarn},
+			#{pureEarnp},
+			#{shiGongFee},
+			#{zhaoDaiFee},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE po_record SET
+			po_no = #{poNo},
+			client_id=#{client.id},
+			pm_id=#{pm.id},
+			seller=#{seller},
+			status=#{status},
+			part_a=#{partA.id},
+			contact=#{contact},
+			cont_phone=#{contPhone},
+			part_b=#{partB.id},
+			proj_name=#{projectName},
+			cost=#{cost},
+			p_cost=#{pCost},
+			p_nCost=#{pNCost},
+			bill_type=#{billType},
+			kai_piao=#{kaiPiao},
+			kp_type=#{kpType},
+			cnt_cost=#{cntCost},
+			sell_cost=#{sellCost},
+			sell_tax = #{sellTax},
+			inc_tax = #{incTax},
+			other_tax = #{otherTax},
+			maoli = #{maoli},
+			maolip = #{maolip},
+			tot_cost = #{totCost},
+			cmp_tax = #{cmpTax},
+			pure_earn = #{pureEarn},
+			pure_earnp = #{pureEarnp},
+			shi_gong_fee=#{shiGongFee},
+			zhao_dai_fee=#{zhaoDaiFee},
+			remarks=#{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE po_record SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getByPo" resultType="PoRecord">
+		  select
+		   <include refid="poRecordColumns"/>
+		   from po_record a
+		<include refid="poRecordJoins"/>
+		where a.del_flag='0' AND a.po_no=#{param1}
+	</select>
+	<delete id="deleteWorksheets">
+		delete FROM t_po_wo where po_id=#{id}
+	</delete>
+	<insert id="insertWorksheets">
+		INSERT INTO t_po_wo(po_id, wo_id)
+		<foreach collection="woWorksheets" item="worksheet" separator=" union all ">
+			SELECT #{id}, #{worksheet.id}
+		</foreach>
+	</insert>
+
+	<select id="getByWoId"  resultType="PoRecord">
+		select
+		<include refid="poRecordColumns"/>
+		from po_record a
+		<include refid="poRecordJoins"/>
+		JOIN t_po_wo tpw ON tpw.po_id =a.id
+		where a.del_flag='0' AND tpw.wo_id=#{param1}
+	</select>
+</mapper>

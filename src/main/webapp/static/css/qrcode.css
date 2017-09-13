@@ -1,0 +1,96 @@
+@charset "utf-8";
+
+#menu-b-l {
+	width:218px;
+	height:34px;
+	right:-154px;
+
+	bottom:70px;
+	position:absolute;
+}
+#menu-b-l .left {
+	width:5px;
+	height:34px;
+	float:left;
+	background:url(../images/tudou-menu-b-l.gif) no-repeat;
+}
+#menu-b-l .content {
+	width:213px;
+	height:34px;
+	float:left;
+	background:url(../images/tudou-menu-b-c.gif) repeat-x;
+}
+#menu-b-l #mini {
+	width:68px;
+	height:34px;
+	float:left;
+	cursor:pointer;
+	line-height:25px;
+	color:#fff;
+	padding:5px;
+}
+
+
+#qrcode {
+	width:213px;
+	height:288px;
+	right:4px;
+	bottom:-218px;
+	position:fixed;
+	background:#fff;
+}
+#qrcode .menu-top {
+	width:213px;
+	height:24px;
+	float:left;
+	background:url(../images/tudou-menu-top1.png) no-repeat;
+}
+#qrcode .menu-top span {
+	width:15px;
+	height:15px;
+	float:right;
+	cursor:pointer;
+	display:inline;
+	margin:5px 5px 0 0;
+}
+#qrcode .menu-t-c {
+	width:201px;
+	height:253px;
+	float:left;
+	padding:5px;
+	border-top:1px solid #3c3c3c;
+	border-left:1px solid #3c3c3c;
+	border-right:1px solid #3c3c3c;
+	background:url(../images/tudou-menu-bg.gif) repeat-x;
+}
+
+#qrcode .menu-t-c .img {
+	width:200px;
+	height:200px;
+	float:left;
+	padding:0;
+	background:#1a1a1a;
+	border:1px solid #4e4e4e;
+}
+#qrcode .menu-t-c .list {
+	width:200px;
+	height:auto;
+	float:left;
+	padding:3px 0;
+}
+#qrcode .menu-t-c .list li {
+	width:200px;
+	height:20px;
+	line-height:20px;
+	text-align:left;
+	text-indent:10px;
+	background:url(../images/sj-1.gif) no-repeat left;
+}
+
+#qrcode .menu-t-c .list li a {
+	color:#afafaf;
+	text-decoration:none;
+}
+#qrcode .menu-t-c .list li a:hover {
+	text-decoration:underline;
+}

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoStationDao">
+    
+	<sql id="woStationColumns">
+		a.id AS "id",
+		a.client_id AS "woClient.id",
+		a.pm_id AS "pm.id",
+		u.name AS "pm.name",
+		c.name AS "woClient.name",
+		a.area_id AS "area.id",
+		a.name AS "name",
+		a.description AS "description",
+		a.addr AS "addr",
+		a.contact AS "contact",
+		a.contact_tel AS "contactTel",
+		a.lat,
+		a.lon,
+		a.email AS "email",
+		a.traffic_fee AS "trafficFee",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a3.name AS "area.name"
+	</sql>
+	
+	<sql id="woStationJoins">
+		LEFT JOIN wo_area a3 ON a3.id = a.area_id
+		LEFT JOIN wo_client c ON c.id =a.client_id
+		LEFT JOIN sys_user u ON u.id =a.pm_id
+	</sql>
+    
+	<select id="get" resultType="WoStation">
+		SELECT 
+			<include refid="woStationColumns"/>
+		FROM wo_station a
+		<include refid="woStationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WoStation">
+		SELECT 
+			<include refid="woStationColumns"/>
+		FROM wo_station a
+		<include refid="woStationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE  concat('%',#{name},'%')
+			</if>
+			<if test="woClient !=null and woClient.id !=null and woClient.id!=''">
+				AND a.client_id = #{woClient.id}
+			</if>
+			<if test="pm !=null and pm.id !=null and pm.id !=''">
+				AND a.pm_id = #{pm.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WoStation">
+		SELECT 
+			<include refid="woStationColumns"/>
+		FROM wo_station a
+		<include refid="woStationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findTreeData" resultType="Map">
+select 0 as level,'1' as id,'0' as pId,'客户站点' as name, null as lat,null as lon,null AS pm,null as addr
+union all
+		select 1 as level,id,'1' as pId,`name`,null as lat,null as lon,null AS pm,null as addr from wo_client
+union ALL
+select 2 as level,id,wo_client as pId,name,null as lat,null as lon,null AS pm,null as addr from wo_area
+union ALL
+select 3 as LEVEL ,concat("s_",a.id) as id,a.area_id as pId,a.NAME,a.lat, a.lon,b.name as pm,a.addr as addr  from wo_station a LEFT JOIN sys_user b ON  a.pm_id =b.id
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_station(
+			id,
+			client_id,
+			area_id,
+			pm_id,
+			name,
+			description,
+			lat,
+			lon,
+			addr,
+			contact,
+			contact_tel,
+			email,
+			traffic_fee,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{woClient.id},
+			#{area.id},
+			#{pm.id},
+			#{name},
+			#{description},
+			#{lat},
+			#{lon},
+			#{addr},
+			#{contact},
+			#{contactTel},
+			#{email},
+			#{trafficFee},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wo_station SET 	
+			client_id = #{woClient.id},
+			area_id = #{area.id},
+			pm_id = #{pm.id},
+			name = #{name},
+			description = #{description},
+			lat=#{lat},
+			lon=#{lon},
+			addr = #{addr},
+			contact = #{contact},
+			contact_tel = #{contactTel},
+			email = #{email},
+			traffic_fee=#{trafficFee},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wo_station SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<delete id="deleteContactByStationId" >
+		DELETE FROM  t_station_contact
+		WHERE station_id=#{stationId}
+	</delete>
+	<delete id="deleteEngineerByStationId">
+		DELETE FROM t_station_engineer
+		WHERE station_id=#{stationId}
+	</delete>
+	<insert id="insertContact">
+		INSERT INTO t_station_contact(
+		station_id,
+		employee_id
+		)
+		<foreach collection="contactList" item="contact" separator=" union all ">
+			SELECT #{id}, #{contact.id}
+			<if test="dbName != 'mssql'">
+				FROM dual
+			</if>
+		</foreach>
+	</insert>
+	<insert id="insertEngineer">
+		INSERT INTO t_station_engineer (
+		station_id,
+		engineer_id
+		)
+		<foreach collection="engineerList" item="engineer" separator=" union all ">
+			SELECT #{id}, #{engineer.id}
+			<if test="dbName != 'mssql'">
+				FROM dual
+			</if>
+		</foreach>
+	</insert>
+</mapper>

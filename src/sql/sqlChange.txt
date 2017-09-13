@@ -1,0 +1,114 @@
+-- ---------站点增加地图经纬度字段-----------
+ALTER TABLE `wo_station`
+ADD COLUMN `lat`  double NULL AFTER `description`,
+ADD COLUMN `lon`  double NULL AFTER `lat`;
+
+-- ------------工程师出发路线记录--------------------
+CREATE TABLE `wo_pos_log` (
+`id`  varchar(64) NOT NULL COMMENT '主键' ,
+`worksheet_id`  varchar(64) NULL COMMENT '工单id' ,
+`user_id`  varchar(64) NULL COMMENT '用户id' ,
+`lat`  double NULL DEFAULT null COMMENT '纬度' ,
+`lon`  double NULL DEFAULT null COMMENT '经度' ,
+`report_date`  datetime NULL COMMENT '上报时间' ,
+`create_date`  datetime NULL COMMENT '创建时间' ,
+PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- -------------工程师实时状态信息------------------------
+CREATE TABLE `wo_engineer_status` (
+  `id` varchar(64) NOT NULL COMMENT '主键',
+  `user_id` varchar(64) DEFAULT NULL COMMENT '工程师id',
+  `status` char(1) DEFAULT NULL COMMENT '工程师状态：1:空闲，2:忙碌',
+  `wo_ids` varchar(2000) DEFAULT NULL COMMENT '进行中工单id集合',
+  `lat` double DEFAULT NULL COMMENT '纬度',
+  `lon` double DEFAULT NULL COMMENT '经度',
+  `report_date` datetime DEFAULT NULL COMMENT '上报时间',
+  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `wo_device` (
+  `id` varchar(64) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `assetcode` varchar(200) DEFAULT NULL,
+  `sncode` varchar(200) DEFAULT NULL,
+  `devcode` varchar(200) DEFAULT NULL,
+  `brand_id` varchar(100) DEFAULT NULL,
+  `model_id` varchar(100) DEFAULT NULL,
+  `online_date` datetime DEFAULT NULL,
+  `client_id` varchar(64) DEFAULT NULL,
+  `station_id` varchar(64) DEFAULT NULL,
+  `type_id` varchar(64) DEFAULT NULL,
+  `keyparams` varchar(64) DEFAULT NULL COMMENT '关键参数',
+  `memo` varchar(255) DEFAULT NULL COMMENT '设备描述',
+  `dev_status` char(1) DEFAULT NULL COMMENT '设备状态',
+  `supplier` varchar(64) DEFAULT NULL COMMENT '供应商',
+  `supplier_man` varchar(64) DEFAULT NULL COMMENT '供应商联系人',
+  `supplier_phone` varchar(64) DEFAULT NULL COMMENT '供应商联系电话',
+  `manufacture_date` datetime DEFAULT NULL COMMENT '出厂日期',
+  `repair_start_date` datetime DEFAULT NULL COMMENT '保修开始日期',
+  `repair_end_date` datetime DEFAULT NULL COMMENT '保修截止日期',
+  `service_level` char(1) DEFAULT NULL COMMENT '服务级别',
+  `service_start_date` datetime DEFAULT NULL COMMENT '服务开始日期',
+  `service_end_date` datetime DEFAULT NULL COMMENT '服务截止日期',
+  `create_by` varchar(64) DEFAULT NULL,
+  `create_date` datetime DEFAULT NULL,
+  `update_by` varchar(64) DEFAULT NULL,
+  `update_date` datetime DEFAULT NULL,
+  `remarks` varchar(255) DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `wo_device` (
+  `id` varchar(64) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `assetcode` varchar(200) DEFAULT NULL,
+  `sncode` varchar(200) DEFAULT NULL,
+  `devcode` varchar(200) DEFAULT NULL,
+  `brand_id` varchar(100) DEFAULT NULL,
+  `model_id` varchar(100) DEFAULT NULL,
+  `online_date` datetime DEFAULT NULL,
+  `client_id` varchar(64) DEFAULT NULL,
+  `station_id` varchar(64) DEFAULT NULL,
+  `area_id` varchar(64) DEFAULT NULL COMMENT '所属区域',
+  `city_id` varchar(64) DEFAULT NULL COMMENT '所属城市',
+  `build_id` varchar(64) DEFAULT NULL COMMENT '所属大楼',
+  `floor_id` varchar(64) DEFAULT NULL COMMENT '所属楼层',
+  `room_id` varchar(64) DEFAULT NULL COMMENT '所属房间',
+  `first_type_id` varchar(64) DEFAULT NULL COMMENT '一级设备类别',
+  `sec_type_id` varchar(64) DEFAULT NULL COMMENT '二级设备类别',
+  `third_type_id` varchar(64) DEFAULT NULL COMMENT '三级设备类别',
+  `keyparams` varchar(64) DEFAULT NULL COMMENT '关键参数',
+  `memo` varchar(255) DEFAULT NULL COMMENT '设备描述',
+  `dev_status` int(11) DEFAULT NULL COMMENT '设备状态',
+  `supplier` varchar(64) DEFAULT NULL COMMENT '供应商',
+  `supplier_man` varchar(64) DEFAULT NULL COMMENT '供应商联系人',
+  `supplier_phone` varchar(64) DEFAULT NULL COMMENT '供应商联系电话',
+  `manufacture_date` datetime DEFAULT NULL COMMENT '出厂日期',
+  `repair_start_date` datetime DEFAULT NULL COMMENT '保修开始日期',
+  `repair_end_date` datetime DEFAULT NULL COMMENT '保修截止日期',
+  `service_level` int(11) DEFAULT NULL COMMENT '服务级别',
+  `service_start_date` datetime DEFAULT NULL COMMENT '服务开始日期',
+  `service_end_date` datetime DEFAULT NULL COMMENT '服务截止日期',
+  `create_by` varchar(64) DEFAULT NULL,
+  `create_date` datetime DEFAULT NULL,
+  `update_by` varchar(64) DEFAULT NULL,
+  `update_date` datetime DEFAULT NULL,
+  `remarks` varchar(255) DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+-- ------------------巡检项增加排序字段----------------------
+ALTER TABLE `wo_work_detail`
+ADD COLUMN `sort`  tinyint NULL AFTER `status`;
+
+-- ------------------巡检项增加结果标签---------------------
+ALTER TABLE `wo_work_detail`
+ADD COLUMN `tag`  char(1) NULL AFTER `status`;
+

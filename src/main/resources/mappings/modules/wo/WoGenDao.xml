@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoGenDao">
+
+    
+	<select id="getCurrentWo" resultType="WoEntity">
+		select id ,
+			date_str AS "dateStr",
+			client_code AS "clientCode",
+			cur_num AS "curNum"
+			from wo_gen_table
+		WHERE
+			client_code=#{clientCode}
+			FOR UPDATE
+	</select>
+
+	<insert id="insert">
+		INSERT INTO wo_gen_table (id,date_str,client_code,cur_num)
+		VALUES (#{id},#{dateStr},#{clientCode},#{curNum})
+	</insert>
+	<update id="update">
+		UPDATE wo_gen_table SET
+		date_str=#{dateStr},
+		cur_num=#{curNum}
+		where id=#{id}
+	</update>
+</mapper>

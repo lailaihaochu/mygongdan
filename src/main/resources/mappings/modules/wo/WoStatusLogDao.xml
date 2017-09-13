@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoStatusLogDao">
+    
+	<select id="findList" resultType="WoStatusLog">
+		SELECT 
+			a.id  AS id,
+			a.worksheet_id AS "woWorksheet.id",
+			a.op_status AS "opStatus",
+			a.op_log AS "opLog",
+			a.operator AS "operator.id",
+			a.op_date AS "opDate",
+			a.remarks AS "remarks",
+			u.name AS "operator.name",
+			c.name AS "operator.company.name",
+			o.name AS "operator.office.name"
+		FROM t_worksheet_statuslog a
+		JOIN sys_user u ON u.id = a.operator
+		JOIN sys_office c ON c.id = u.company_id
+		JOIN sys_office o ON o.id = u.office_id
+		WHERE a.worksheet_id=#{woWorksheet.id}
+		ORDER BY a.op_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_worksheet_statuslog(
+			id, 
+			worksheet_id,
+			op_status,
+			op_log,
+			operator,
+			op_date,
+			remarks
+		) VALUES (
+			#{id}, 
+			#{woWorksheet.id},
+			#{opStatus},
+			#{opLog},
+			#{operator.id},
+			#{opDate},
+			#{remarks}
+		)
+	</insert>
+	
+</mapper>

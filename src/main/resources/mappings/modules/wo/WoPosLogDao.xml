@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoPosLogDao">
+	<sql id="woPosLogColumns">
+		a.id,
+		a.worksheet_id AS "worksheet.id",
+		wo.sn_no AS "worksheet.snNo",
+		wo.wo_no AS "worksheet.woNo",
+		a.user_id AS "engineer.id",
+		u.name AS "engineer.name",
+		a.lat,
+		a.lon,
+		a.report_date,
+		a.create_date
+	</sql>
+	<sql id="woPosLogJoins">
+		LEFT JOIN wo_worksheet wo ON  a.worksheet_id =wo.id
+		LEFT JOIN sys_user u ON a.user_id = u.id
+	</sql>
+    
+	<select id="findList" resultType="WoPosLog">
+		SELECT 
+			<include refid="woPosLogColumns"/>
+		FROM wo_pos_log a
+		<include refid="woPosLogJoins"/>
+		WHERE 1=1
+		<if test="worksheet != null and worksheet.id!=null and worksheet.id != ''">
+			AND a.worksheet_id =#{worksheet.id}
+		</if>
+		<if test="engineer != null and engineer.id != null and engineer.id != ''">
+			AND a.user_id = #{engineer.id}
+		</if>
+		<if test="startDate != null ">
+			AND a.report_date &gt; = #{startDate}
+		</if>
+
+		<if test="endDate != null ">
+			AND a.report_date &lt;= #{endDate}
+		</if>
+		ORDER BY a.report_date
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_pos_log(
+			id, 
+			worksheet_id,
+			user_id,
+			lat,
+			lon,
+			report_date,
+			create_date
+		) VALUES (
+			#{id}, 
+			#{worksheet.id},
+			#{engineer.id},
+			#{lat},
+			#{lon},
+			#{reportDate},
+			#{createDate}
+		)
+	</insert>
+	
+</mapper>

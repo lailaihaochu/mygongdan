@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoFeeItemDao">
+    <sql id="feeItemColumns">
+        a.id AS "id",
+        a.worksheet_id AS "woWorksheet.id",
+        a.name AS "name",
+        a.fee_type AS "feeType",
+        a.sort AS "sort",
+        a.price AS "price",
+        a.out_per AS "outPer",
+        a.out_price AS "outPrice",
+        a.num AS "num",
+        a.cost AS "cost",
+        a.bill_type AS "billType",
+        a.npb AS "npb",
+        a.zpb AS "zpb",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+    <insert id="insert">
+        insert INTO wo_fee_item (
+        id,
+        name,
+        worksheet_id,
+        fee_type,
+        sort,
+        out_price,
+        out_per,
+        price,
+        num,
+        cost,
+        bill_type,
+        npb,
+        zpb,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )
+        VALUES (
+        #{id},
+        #{name},
+        #{woWorksheet.id},
+        #{feeType},
+        #{sort},
+        #{outPrice},
+        #{outPer},
+        #{price},
+        #{num},
+        #{cost},
+        #{billType},
+        #{npb},
+        #{zpb},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+    <update id="update">
+        update wo_fee_item set
+        name =#{name},
+        price=#{price},
+        num=#{num},
+        cost =#{cost},
+        sort=#{sort},
+        out_per=#{outPer},
+        out_price=#{outPrice},
+        bill_type=#{billType},
+        npb=#{npb},
+        zpb=#{zpb}
+        where id=#{id}
+    </update>
+    <delete id="delete">
+        update wo_fee_item SET
+        del_flag='1'
+        where id=#{id}
+    </delete>
+    <select id="get" resultType="WoFeeItem">
+        select
+        <include refid="feeItemColumns"/>
+        FROM wo_fee_item a
+        where a.id=#{id} and a.del_flag='0'
+    </select>
+
+    <select id="findByWorksheet" resultType="WoFeeItem">
+        select
+        <include refid="feeItemColumns"/>
+        FROM wo_fee_item a
+        WHERE  a.del_flag='0' AND
+        a.worksheet_id = #{woWorksheet.id}
+        order by a.sort
+    </select>
+</mapper>

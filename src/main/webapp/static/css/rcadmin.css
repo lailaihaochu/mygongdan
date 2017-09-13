@@ -1,0 +1,29 @@
+body,label,input,button,select,textarea,.uneditable-input,.navbar-search .search-query {font-family:Helvetica, Georgia, Arial, sans-serif, 宋体;font-size:13px;_font-size:12px;}
+
+.measure-input {background:url("../img/ruler.gif") repeat-x scroll 0 bottom transparent;}
+.input-xxlarge {width:460px;}
+.alert {margin-bottom:10px;}
+.well{margin-bottom: 10px;}
+.nav, .breadcrumb {margin-bottom:8px;}
+.nav-list li a {margin-top:5px;margin-bottom:5px;_padding-top:6px;} .nav-list li a i{_margin-top:-1px;}
+
+.table {margin-bottom:8px;background-color:#fdfdfd; font-size: 13px;}
+.table th, .table td {vertical-align:middle;}
+.table td i{margin:0 2px;}
+.table-striped tbody>tr:nth-child(odd)>td, .table-striped tbody>tr:nth-child(odd)>th{background-color:#F5F5F5}
+.sort-column{color:#0663A2;cursor:pointer;}
+.pagination .controls a{border:0;}
+.pagination .controls input{border:0;color:#999;width:30px;padding:0;margin:-3px 0 0 0;text-align:center;}
+.pagination ul{ padding:0}
+
+.accordion-heading,.table th {white-space:nowrap;-webkit-border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;border-radius:3px 3px 0 0;background-color:#fbfbfb;
+    background-image:-moz-linear-gradient(top, #ffffff, #f5f5f5);background-image:-ms-linear-gradient(top, #ffffff, #f5f5f5);
+    background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f5f5f5));background-image:-webkit-linear-gradient(top, #ffffff, #f5f5f5);
+    background-image:-o-linear-gradient(top, #ffffff, #f5f5f5);background-image:linear-gradient(top, #ffffff, #f5f5f5);
+    background-repeat:repeat-x;filter:progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#f5f5f5', GradientType=0);}
+.accordion-heading {float:inherit;width:100%;} .accordion-heading a:hover,.dropdown a:hover {text-decoration:none;background:none;}
+.accordion-heading .accordion-toggle {font-family:黑体;font-size:14px;_padding-top:10px;_padding-bottom:8px;}
+.accordion-heading .accordion-toggle i {_margin-top:-1px;} .accordion-inner {padding:8px 13px 3px 13px;}
+#left,#right,#openClose {float:left;} #openClose {width:8px;margin:0 1px;cursor:pointer;}
+#openClose,#openClose.close {background:#fdfdfd url("../img/openclose.png") no-repeat -29px center;}
+#openClose.close {background-position:1px center;}

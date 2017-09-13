@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoWorksheetDao">
+    
+	<sql id="woWorksheetColumns">
+		a.id AS "id",
+		a.sn_no	AS "snNo",
+		a.wo_no AS "woNo",
+		a.wo_status AS "woStatus",
+		a.wo_type AS "woType",
+		a.service_type AS "serviceType",
+		a.em_grade AS "emGrade",
+		a.env_status AS "envStatus",
+		a.wo_client AS "woClient.id",
+		c.name AS "woClient.name",
+		a.wo_station AS "woStation.id",
+		s.traffic_fee AS "woStation.trafficFee",
+		a.traffic_fee AS "trafficFee",
+		a.traffic_fee_out AS "trafficFeeOut",
+		a.traffic_desc AS "trafficDesc",
+		s.name  AS "woStation.name",
+		pm.id AS "woStation.pm.id",
+		pm.name AS "woStation.pm.name",
+		a.calculate_type AS "calculateType",
+		a.description AS "description",
+		a.advance_time AS "advanceTime",
+		a.begin_time as "beginTime",
+		a.real_time AS "realTime",
+		a.end_time AS "endTime",
+		a.complete_time AS "completeTime",
+		a.close_time AS "closeTime",
+		a.need_assit_num AS "needAssitNum",
+		a.fee_status AS "feeStatus",
+		a.reason AS "reason",
+		a.act_start_time AS "actStartTime",
+		a.acp_type AS "acpType",
+		a.other AS "other",
+		a.tot_cost_time AS "totCostTime",
+		a.wait_time AS "waitTime",
+		a.start_wait_time AS "startWaitTime",
+		a.act_cost_time AS "actCostTime",
+		a.create_by AS "createBy.id",
+		u.name AS "createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="woWorksheetJoins">
+		LEFT JOIN wo_client c ON  c.id =a.wo_client
+		LEFT JOIN wo_station s ON  s.id =a.wo_station
+		LEFT JOIN sys_user u ON  u.id =a.create_by
+	  	LEFT JOIN sys_user pm ON pm.id= s.pm_id
+	</sql>
+    
+	<select id="get" resultType="WoWorksheet">
+		SELECT 
+			<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="count" resultType="Long">
+		select count(*) from (
+		SELECT
+		DISTINCT
+		<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		<if test="isSelf">
+			LEFT JOIN t_worksheet_engineer twe ON twe.worksheet_id = a.id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginDate !=null">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate !=null">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="isSelf">
+				AND (twe.engineer_id = #{currentUser.id} OR s.pm_id=#{currentUser.id} OR a.create_by =#{currentUser.id})
+			</if>
+			<if test="woClient !=null and woClient.id !=null and woClient.id !=''">
+				AND a.wo_client=#{woClient.id}
+			</if>
+			<if test="woStation !=null and woStation.id !=null and woStation.id !=''">
+				AND a.wo_station=#{woStation.id}
+			</if>
+			<if test="woStation !=null and woStation.pm !=null and woStation.pm.id!=null and woStation.pm.id !=''">
+				AND pm.id=#{woStation.pm.id}
+			</if>
+			<if test="calculateType !=null and calculateType !=''">
+				AND a.calculate_type=#{calculateType}
+			</if>
+			<if test="snNo !=null and snNo !=''">
+				AND a.sn_no LIKE concat('%',#{snNo},'%')
+			</if>
+			<if test="woNo !=null and woNo !=''">
+				AND a.wo_no LIKE concat('%',#{woNo},'%')
+			</if>
+			<if test="woType !=null and woType !=''">
+				AND a.wo_type=#{woType}
+			</if>
+			<if test="woStatus!=null and woStatus !=''">
+				AND a.wo_status=#{woStatus}
+			</if>
+			<if test="emGrade !=null and emGrade !=''">
+				AND a.em_grade=#{emGrade}
+			</if>
+			<if test="envStatus !=null and envStatus!=''">
+				AND a.env_status=#{envStatus}
+			</if>
+			<if test="remarks !=null and remarks!=''">
+				AND a.remarks LIKE concat('%',#{remarks},'%')
+			</if>
+			<if test="createBy !=null and createBy.id !=null and createBy.id !=''">
+				AND a.create_by =#{createBy.id}
+			</if>
+
+		</where>
+		) co
+
+	</select>
+	<select id="findList" resultType="WoWorksheet">
+		SELECT
+		DISTINCT
+			<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		<if test="isSelf">
+			LEFT JOIN t_worksheet_engineer twe ON twe.worksheet_id = a.id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginDate !=null">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate !=null">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="isSelf">
+				AND (twe.engineer_id = #{currentUser.id} OR s.pm_id=#{currentUser.id} OR a.create_by =#{currentUser.id})
+			</if>
+			<if test="woClient !=null and woClient.id !=null and woClient.id !=''">
+				AND a.wo_client=#{woClient.id}
+			</if>
+			<if test="woStation !=null and woStation.id !=null and woStation.id !=''">
+				AND a.wo_station=#{woStation.id}
+			</if>
+			<if test="woStation !=null and woStation.pm !=null and woStation.pm.id!=null and woStation.pm.id !=''">
+				AND pm.id=#{woStation.pm.id}
+			</if>
+			<if test="calculateType !=null and calculateType !=''">
+				AND a.calculate_type=#{calculateType}
+			</if>
+			<if test="snNo !=null and snNo !=''">
+				AND  a.sn_no LIKE concat('%',#{snNo},'%')
+			</if>
+			<if test="woNo !=null and woNo !=''">
+				AND  a.wo_no LIKE concat('%',#{woNo},'%')
+			</if>
+			<if test="woType !=null and woType !=''">
+				AND a.wo_type=#{woType}
+			</if>
+			<if test="woStatus!=null and woStatus !=''">
+				AND  a.wo_status=#{woStatus}
+			</if>
+			<if test="emGrade !=null and emGrade !=''">
+				AND a.em_grade=#{emGrade}
+			</if>
+			<if test="envStatus !=null and envStatus!=''">
+				AND a.env_status=#{envStatus}
+			</if>
+			<if test="remarks !=null and remarks!=''">
+				AND a.remarks LIKE concat('%',#{remarks},'%')
+			</if>
+			<if test="createBy !=null and createBy.id !=null and createBy.id !=''">
+				AND a.create_by =#{createBy.id}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListForPO" resultType="WoWorksheet">
+		SELECT
+		DISTINCT
+		<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND  a.fee_status = 1
+			<if test="beginDate !=null">
+				AND a.complete_time &gt;= #{beginDate}
+			</if>
+			<if test="endDate !=null">
+				AND a.complete_time &lt;= #{endDate}
+			</if>
+
+			<if test="woClient !=null and woClient.id !=null and woClient.id !=''">
+				AND a.wo_client=#{woClient.id}
+			</if>
+			<if test="woStation !=null and woStation.pm !=null and woStation.pm.id!=null and woStation.pm.id !=''">
+				AND pm.id=#{woStation.pm.id}
+			</if>
+			<if test="calculateType !=null and calculateType !=''">
+				AND a.calculate_type=#{calculateType}
+			</if>
+			<if test="woStatus!=null and woStatus !=''">
+				AND  a.wo_status=#{woStatus}
+			</if>
+			<if test="woType !=null and woType !=''">
+				AND a.wo_type=#{woType}
+			</if>
+			AND a.id not in (select DISTINCT wo_id from t_po_wo)
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.complete_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WoWorksheet">
+		SELECT 
+			<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_worksheet(
+			id,
+			sn_no,
+			wo_no,
+			wo_status,
+			wo_type,
+			service_type,
+			em_grade,
+			env_status,
+			wo_client,
+			wo_station,
+			calculate_type,
+			description,
+			advance_time,
+			real_time,
+			end_time,
+			complete_time,
+			close_time,
+			need_assit_num,
+			reason,
+			act_start_time,
+			acp_type,
+			other,
+			tot_cost_time,
+			wait_time,
+			act_cost_time,
+			remarks,
+			fee_status,
+			traffic_fee,
+			traffic_fee_out,
+			traffic_desc,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{snNo},
+			#{woNo},
+			#{woStatus},
+			#{woType},
+			#{serviceType},
+			#{emGrade},
+			#{envStatus},
+			#{woClient.id},
+			#{woStation.id},
+			#{calculateType},
+			#{description},
+			#{advanceTime},
+			#{realTime},
+			#{endTime},
+			#{completeTime},
+			#{closeTime},
+			#{needAssitNum},
+			#{reason},
+			#{actStartTime},
+			#{acpType},
+			#{other},
+			#{totCostTime},
+			#{waitTime},
+			#{actCostTime},
+			#{remarks},
+			#{feeStatus},
+			#{trafficFee},
+			#{trafficFeeOut},
+			#{trafficDesc},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wo_worksheet SET 	
+			sn_no=#{snNo},
+			wo_no = #{woNo},
+			wo_status = #{woStatus},
+			wo_type = #{woType},
+			service_type=#{serviceType},
+			em_grade = #{emGrade},
+			env_status=#{envStatus},
+			wo_client = #{woClient.id},
+			wo_station = #{woStation.id},
+			calculate_type = #{calculateType},
+			description = #{description},
+			advance_time = #{advanceTime},
+			real_time = #{realTime},
+			end_time = #{endTime},
+			begin_time=#{beginTime},
+			complete_time = #{completeTime},
+			close_time = #{closeTime},
+			need_assit_num=#{needAssitNum},
+			reason=#{reason},
+			act_start_time=#{actStartTime},
+			acp_type=#{acpType},
+			other=#{other},
+			tot_cost_time=#{totCostTime},
+			wait_time=#{waitTime},
+			start_wait_time=#{startWaitTime},
+			act_cost_time=#{actCostTime},
+			remarks=#{remarks},
+			fee_status=#{feeStatus},
+			traffic_fee=#{trafficFee},
+			traffic_fee_out=#{trafficFeeOut},
+			traffic_desc=#{trafficDesc},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wo_worksheet SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<delete id="deleteEngineerInWorkSheet" >
+		DELETE FROM t_worksheet_engineer
+		WHERE worksheet_id=#{param1.id} AND engineer_id=#{param2.id}
+	</delete>
+	<insert id="insertEngineerInWorkSheet" >
+		INSERT INTO t_worksheet_engineer(worksheet_id,engineer_id,is_checked) VALUES (#{param1.id},#{param2.id},'0')
+	</insert>
+
+	<select id="findListByAssignedEngineer" resultType="WoWorksheet">
+		SELECT
+		<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		LEFT JOIN t_worksheet_engineer twe ON twe.worksheet_id=a.id
+		WHERE a.del_flag='0' and twe.engineer_id=#{param1}
+	</select>
+	<select id="findListByPoId" resultType="WoWorksheet">
+		SELECT
+		<include refid="woWorksheetColumns"/>
+		FROM wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		LEFT JOIN t_po_wo tpw ON tpw.wo_id=a.id
+		WHERE a.del_flag='0' and tpw.po_id=#{param1}
+	</select>
+	<update id="saveEngineerCheck">
+		UPDATE  t_worksheet_engineer
+		SET  is_checked='1'
+		WHERE worksheet_id=#{param1.id} and engineer_id=#{param2.id}
+	</update>
+	<select id="getBySn" resultType="WoWorksheet">
+		  select
+		   <include refid="woWorksheetColumns"/>
+		   from wo_worksheet a
+		<include refid="woWorksheetJoins"/>
+		where a.del_flag='0' AND a.sn_no=#{param1}
+	</select>
+
+	<delete id="deleteWorksheetDevice">
+		DELETE FROM wo_worksheet_device WHERE worksheet_id = #{id}
+	</delete>
+
+	<insert id="insertWorksheetDevice">
+		INSERT INTO wo_worksheet_device(worksheet_id, device_id)
+		<foreach collection="deviceList" item="device" separator=" union all ">
+			SELECT #{id}, #{device.id}
+			<if test="dbName != 'mssql'">
+				FROM dual
+			</if>
+		</foreach>
+	</insert>
+
+	<select id="findDeviceIdsByWorkSheetId" resultType="String">
+		select
+		a.device_id
+		from wo_worksheet_device a
+		where a.worksheet_id=#{param1}
+	</select>
+
+</mapper>

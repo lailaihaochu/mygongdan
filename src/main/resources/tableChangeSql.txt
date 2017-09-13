@@ -1,0 +1,5 @@
+
+//wo_device 表中新增 build_id, floor_id,room_id,三列
+ALTER TABLE wo_device ALTER COLUMN build_id varchar(64) COMMENT='所属大楼';
+ALTER TABLE wo_device ALTER COLUMN floor_id varchar(64) COMMENT='所属楼层';
+ALTER TABLE wo_device ALTER COLUMN room_id varchar(64) COMMENT='所属房间';

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinbang.gongdan.modules.wo.dao.WoContractDao">
+    
+	<sql id="woContractColumns">
+		a.id AS "id",
+		a.contract_no AS "contractNo",
+		a.project_name AS "projectName",
+		a.part_a AS "partA.id",
+		pa.name AS "partA.name",
+		a.part_a_c AS "partAEmp.id",
+		e.name AS "partAEmp.name",
+		a.part_a_contact AS "partAContact",
+		a.part_a_contact_tel AS "partAContactTel",
+		a.part_b AS "partB.id",
+		o.name AS "partB.name",
+		a.part_b_c AS "partBEmp.id",
+		u.name AS "partBEmp.name",
+		a.part_b_contact AS "partBContact",
+		a.part_b_contact_tel AS "partBContactTel",
+		a.contract_content AS "contractContent",
+		a.contract_files AS "contractFiles",
+		a.contract_status AS "contractStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="woContractJoins">
+		LEFT JOIN wo_client pa ON  pa.id = a.part_a
+		LEFT JOIN wo_employee e ON e.id=a.part_a_c
+		LEFT JOIN sys_office o ON  o.id=a.part_b
+		LEFT JOIN sys_user u ON u.id=a.part_b_c
+	</sql>
+    
+	<select id="get" resultType="WoContract">
+		SELECT 
+			<include refid="woContractColumns"/>
+		FROM wo_contract a
+		<include refid="woContractJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WoContract">
+		SELECT 
+			<include refid="woContractColumns"/>
+		FROM wo_contract a
+		<include refid="woContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WoContract">
+		SELECT 
+			<include refid="woContractColumns"/>
+		FROM wo_contract a
+		<include refid="woContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wo_contract(
+			id,
+			contract_no,
+			project_name,
+			part_a,
+			part_a_c,
+			part_a_contact,
+			part_a_contact_tel,
+			part_b,
+			part_b_c,
+			part_b_contact,
+			part_b_contact_tel,
+			contract_content,
+			contract_files,
+			contract_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{contractNo},
+			#{projectName},
+			#{partA.id},
+			#{partAEmp.id},
+			#{partAContact},
+			#{partAContactTel},
+			#{partB.id},
+			#{partBEmp.id},
+			#{partBContact},
+			#{partBContactTel},
+			#{contractContent},
+			#{contractFiles},
+			#{contractStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wo_contract SET 	
+			contract_no = #{contractNo},
+			project_name = #{projectName},
+			part_a = #{partA.id},
+			part_a_c=#{partAEmp.id},
+			part_a_contact = #{partAContact},
+			part_a_contact_tel = #{partAContactTel},
+			part_b = #{partB.id},
+			part_b_c=#{partBEmp.id},
+			part_b_contact = #{partBContact},
+			part_b_contact_tel = #{partBContactTel},
+			contract_content = #{contractContent},
+			contract_files = #{contractFiles},
+			contract_status = #{contractStatus},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wo_contract SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
